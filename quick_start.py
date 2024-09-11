@@ -1,15 +1,15 @@
 import re
-
-import torch
-from transformers import AutoTokenizer
-from vllm import LLM, SamplingParams
+from llama_cpp import Llama
 
 from prover.lean.verifier import Lean4ServerScheduler
 
-
-model_name = "deepseek-ai/DeepSeek-Prover-V1.5-RL"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = LLM(model=model_name, max_num_batched_tokens=8192, seed=1, trust_remote_code=True)
+# Initialize the model
+llm = Llama.from_pretrained(
+    repo_id="arbius/DeepSeek-Prover-V1.5-RL-GGUF",
+    filename="DeepSeek-Prover-V1.5-RL.Q4_K_M.gguf",
+    n_ctx=4096,  # Adjust based on your needs and available memory
+    n_threads=8  # Adjust based on your Mac Studio's CPU
+)
 
 lean4_scheduler = Lean4ServerScheduler(max_concurrent_requests=1, timeout=300, memory_limit=10, name='verifier')
 
